@@ -1,7 +1,7 @@
 package gofid
 
 /**
-* Fident uses the Fortifi Open ID structure specification (See 'ID Structure' documentation)
+* Gofid: Fortifi Open ID
 **/
 
 import (
@@ -18,6 +18,9 @@ import (
 type TypeIndicator string
 
 const (
+	vendorLength         = 3
+	typeElementLength    = 2
+	priLocationLength    = 5
 	idLength             = 32
 	timeKeyBase          = 36
 	randLen              = 7
@@ -80,19 +83,19 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 		systemIndicator = IndicatorEntity
 	}
 
-	if len(vendor) != 3 {
-		return "", errors.New("Vendor must be of length '3'")
+	if len(vendor) != vendorLength {
+		return "", fmt.Errorf("Vendor must be of length '%d'", vendorLength)
 	}
 
-	if len(nType) != 2 {
-		return "", errors.New("Type must be of length '2'")
+	if len(nType) != typeElementLength {
+		return "", fmt.Errorf("Type must be of length '%d'", typeElementLength)
 	}
 
-	if len(nSubType) != 2 {
+	if len(nSubType) != typeElementLength {
 		nSubType = nType
 	}
 
-	if len(priLocation) != 5 {
+	if len(priLocation) != priLocationLength {
 		priLocation = unknownLocationValue
 	}
 
