@@ -103,7 +103,7 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 	return strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", timeKey, delimitChar, systemIndicator, vendor, nType, nSubType, delimitChar, priLocation, delimitChar, randomString)), nil
 }
 
-// Validate is true if string is a valid Fortifi Open ID
+// Verify is true if string is a valid Fortifi Open ID
 func Verify(id string) (bool, error) {
 	if len(id) != idLength {
 		return false, errors.New("ID is of invalid length")
