@@ -104,7 +104,7 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 }
 
 // Validate is true if string is a valid Fortifi Open ID
-func Validate(id string) (bool, error) {
+func Verify(id string) (bool, error) {
 	if len(id) != idLength {
 		return false, errors.New("ID is of invalid length")
 	}
@@ -125,7 +125,7 @@ func Validate(id string) (bool, error) {
 
 // GetTimeFromID Returns the time from the timekey embedded in ID
 func GetTimeFromID(id string) (time.Time, error) {
-	validate, err := Validate(id)
+	validate, err := Verify(id)
 	if validate != true {
 		return time.Time{}, err
 	}

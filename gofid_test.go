@@ -20,7 +20,7 @@ const testSubType = "ES"
 func TestGenerationOfNewID(t *testing.T) {
 	inputTime := time.Now()
 	logging.Write(logging.LevelTest, "Testing full ID generation")
-	id, err := New(IndicatorEntity, testVendor, testType, testSubType, "")
+	id, err := Generate(IndicatorEntity, testVendor, testType, testSubType, "")
 	if err != nil || id == "" || len(id) != idLength {
 		logging.Write(logging.LevelTestFailure, "Error generating ID")
 		t.Fail()
@@ -33,7 +33,7 @@ func TestGenerationOfNewID(t *testing.T) {
 		t.Fail()
 	}
 
-	if result, err := Validate(id); result == false {
+	if result, err := Verify(id); result == false {
 		logging.Write(logging.LevelTestFailure, "Generated ID was invalid: "+err.Error())
 		t.Fail()
 	}
@@ -106,18 +106,18 @@ const testInvalidID = "55QRHT4E-EFOTKPS-USC1B-39H6POWT"
 // TestIDValidation tests IDs validate correctly
 func TestIDValidation(t *testing.T) {
 	logging.Write(logging.LevelTest, "Testing ID Validation")
-	if result, _ := Validate(testValidID1); result == false {
-		logging.Write(logging.LevelTestFailure, "Valid ID failed to validate")
+	if result, _ := Verify(testValidID1); result == false {
+		logging.Write(logging.LevelTestFailure, "Valid ID failed verification")
 		t.Fail()
 	}
 
-	if result, _ := Validate(testValidID2); result == false {
-		logging.Write(logging.LevelTestFailure, "Valid ID failed to validate")
+	if result, _ := Verify(testValidID2); result == false {
+		logging.Write(logging.LevelTestFailure, "Valid ID failed verification")
 		t.Fail()
 	}
 
-	if result, _ := Validate(testInvalidID); result == true {
-		logging.Write(logging.LevelTestFailure, "Invalid ID did validate")
+	if result, _ := Verify(testInvalidID); result == true {
+		logging.Write(logging.LevelTestFailure, "Invalid ID did verify")
 		t.Fail()
 	}
 }
