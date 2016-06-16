@@ -1,4 +1,4 @@
-package idgen
+package gofid
 
 /**
 * Fident uses the Fortifi Open ID structure specification (See 'ID Structure' documentation)
@@ -68,8 +68,8 @@ const (
 		IndicatorTimeSeries + IndicatorTimeSeries + IndicatorRelationship + IndicatorNote + IndicatorFile
 )
 
-// New returns a newly generated ID in Fortifi Open ID format
-func New(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocation string) (string, error) {
+// Generate returns a new ID in Fortifi Open ID format
+func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocation string) (string, error) {
 	timeKey, err := getBase32TimeKey(time.Now())
 	if err != nil {
 		return "", err
