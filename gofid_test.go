@@ -73,6 +73,10 @@ func TestGenerationOfNewIDWithVendorSecret(t *testing.T) {
 	if keyTime.Day() != inputTime.Day() {
 		t.Errorf("Timekey in ID is an unexpected value")
 	}
+
+	if result, _ := Verify(id, testVendorSecret+"qweqwe"); result == true {
+		t.Errorf("ID passed verification with invalid vendor secret")
+	}
 }
 
 // TestBase36KeyGeneration tests generation of the base36 time key
@@ -138,7 +142,7 @@ func TestIDValidation(t *testing.T) {
 	}
 }
 
-//
+// TestValidationFromExternalSource tests externally generated IDs
 func TestValidationFromExternalSource(t *testing.T) {
 	fids := []string{
 		"IPIH7MHX=-EABCCDEF-MISCR-OI35356", "IPIH7MHX=-EABCCDEF-MISCR-998CT0G", "IPIH7MHX=-EABCCDEF-MISCR-36L8W35", "IPIH7MHX=-EABCCDEF-MISCR-W8H41AF", "IPIH7MHX=-EABCCDEF-MISCR-2XV3I8C",

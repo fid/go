@@ -5,6 +5,8 @@ package gofid
 **/
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -72,7 +74,7 @@ const (
 )
 
 // Generate returns a new ID in Fortifi Open ID format
-func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocation string) (string, error) {
+func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocation, vendorSecret string) (string, error) {
 	timeKey, err := getBase32TimeKey(time.Now())
 	if err != nil {
 		return "", err
@@ -100,11 +102,25 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 	}
 
 	randomString := getRandString(randLen)
-	return strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", timeKey, delimitChar, systemIndicator, vendor, nType, nSubType, delimitChar, priLocation, delimitChar, randomString)), nil
+
+	result := ""
+	preResult := strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", timeKey, delimitChar, systemIndicator, vendor, nType, nSubType, delimitChar, priLocation, delimitChar, randomString))
+
+	if len(vendorSecret) > 0 {
+		preResult = preResult[:len(preResult)-1]
+		h := md5.New()
+		h.Write([]byte(vendorSecret + preResult))
+		hexEncoding := hex.EncodeToString(h.Sum(nil))
+		result = preResult + strings.ToUpper(string(hexEncoding[0]))
+	} else {
+		result = preResult
+	}
+
+	return result, nil
 }
 
 // Verify is true if string is a valid Fortifi Open ID
-func Verify(id string) (bool, error) {
+func Verify(id, vendorSecret string) (bool, error) {
 	if len(id) != idLength {
 		return false, errors.New("ID is of invalid length")
 	}
@@ -120,12 +136,24 @@ func Verify(id string) (bool, error) {
 		return false, errors.New("Unexpected element count in ID")
 	}
 
+	if vendorSecret != "" {
+		checkChar := string(id[len(id)-1:])
+		idMinusCS := string(id[0:(len(id) - 1)])
+		h := md5.New()
+		h.Write([]byte(vendorSecret + idMinusCS))
+		hexEncoding := hex.EncodeToString(h.Sum(nil))
+
+		if strings.ToUpper(string(hexEncoding[0])) != checkChar {
+			return false, errors.New("Checksum does not match vendor secret")
+		}
+	}
+
 	return true, nil
 }
 
 // GetTimeFromID Returns the time from the timekey embedded in ID
 func GetTimeFromID(id string) (time.Time, error) {
-	validate, err := Verify(id)
+	validate, err := Verify(id, "")
 	if validate != true {
 		return time.Time{}, err
 	}
