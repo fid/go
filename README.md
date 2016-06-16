@@ -2,13 +2,16 @@
 FID Library for Go
 
 #### Generate
-Generate(System Indicator, Vendor, Type, SubType, Location)
+Generate(System Indicator, Vendor, Type, SubType, Location, Secret)
 ```
-ID, err := gofid.Generate(gofid.IndicatorEntity, “FOR”, “TE”, “ST”, "")
+id, err := gofid.Generate(gofid.IndicatorEntity, "FOR", "TE", "ST", "", "secr3t")
 ```
 
 #### Verify
-TBC
+Verify(FID , Secret)
+```
+result, err := gofid.Verify("IPIH7MI2=-EABCCDEF-MISCR-V669VFQ", "secr3t")
+```
 
 #### Describe
 TBC
