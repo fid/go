@@ -14,4 +14,21 @@ result, err := gofid.Verify("IPIH7MI2=-EABCCDEF-MISCR-V669VFQ", "secr3t")
 ```
 
 #### Describe
-TBC
+Describe(FID)
+```
+result, err := gofid.Describe("IPIH7MI2=-EABCCDEF-MISCR-V669VFQ")
+```
+
+Describe() returns a description structure
+```go
+type Description struct {
+	Indicator    gofid.TypeIndicator
+	VendorKey    string
+	Type         string
+	SubType      string
+	Location     string
+	TimeKey      string
+	Time         time.Time
+	RandomString string
+}
+```

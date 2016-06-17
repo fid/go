@@ -7,14 +7,12 @@ import (
 	"time"
 )
 
-// Test params
 const (
 	specTimeKeyLength = 9
 	testVendorSecret  = "bad_secret"
-
-	testVendor  = "FID"
-	testType    = "TE"
-	testSubType = "ES"
+	testVendor        = "FID"
+	testType          = "TE"
+	testSubType       = "ES"
 )
 
 // TestGenerationOfNewID tests that the full ID generation output is as expected
@@ -36,10 +34,12 @@ func TestGenerationOfNewID(t *testing.T) {
 		t.Errorf("Generated ID was invalid: " + err.Error())
 	}
 
-	keyTime, err := GetTimeFromID(id)
+	description, err := Describe(id)
 	if err != nil {
-		t.Errorf("Error with embedded timekey " + err.Error())
+		t.Errorf("Error with description " + err.Error())
 	}
+
+	keyTime := description.Time
 
 	if keyTime.Day() != inputTime.Day() {
 		t.Errorf("Timekey in ID is an unexpected value")
@@ -65,10 +65,12 @@ func TestGenerationOfNewIDWithVendorSecret(t *testing.T) {
 		t.Errorf("Generated ID was invalid: " + err.Error())
 	}
 
-	keyTime, err := GetTimeFromID(id)
+	description, err := Describe(id)
 	if err != nil {
-		t.Errorf("Error with embedded timekey " + err.Error())
+		t.Errorf("Error with description " + err.Error())
 	}
+
+	keyTime := description.Time
 
 	if keyTime.Day() != inputTime.Day() {
 		t.Errorf("Timekey in ID is an unexpected value")
@@ -174,6 +176,51 @@ func TestValidationFromExternalSource(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error when validating fid")
 		}
+	}
+}
+
+// TestGetDescription generates a description and compares it against input data
+func TestGetDescription(t *testing.T) {
+	timeKey := "55QRHT4ET"
+	systemIndicator := IndicatorLog
+	vendorKey := "FOR"
+	ntype := "TE"
+	subType := "ST"
+	location := "USC1B"
+	rand := "XRAQPPD"
+	inputID := timeKey + delimitChar + string(systemIndicator) + vendorKey + ntype + subType + delimitChar + location + delimitChar + rand
+
+	description, err := Describe(inputID)
+	if err != nil {
+		t.Errorf("Error when describing FID")
+	}
+
+	if description.TimeKey != timeKey {
+		t.Errorf("Description time key %s does not match input %s", description.TimeKey, timeKey)
+	}
+
+	if description.Indicator != systemIndicator {
+		t.Errorf("Description indicator %s does not match input %s", description.Indicator, systemIndicator)
+	}
+
+	if description.VendorKey != vendorKey {
+		t.Errorf("Description vendor key %s does not match input %s", description.VendorKey, vendorKey)
+	}
+
+	if description.Type != ntype {
+		t.Errorf("Description type %s does not match input %s", description.Type, ntype)
+	}
+
+	if description.SubType != subType {
+		t.Errorf("Description subType %s does not match input %s", description.SubType, subType)
+	}
+
+	if description.Location != location {
+		t.Errorf("Description location %s does not match input %s", description.Location, location)
+	}
+
+	if description.RandomString != rand {
+		t.Errorf("Description random string %s does not match input %s", description.TimeKey, timeKey)
 	}
 }
 

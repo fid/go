@@ -19,6 +19,18 @@ import (
 // TypeIndicator system indicators
 type TypeIndicator string
 
+// Description of ID input to 'Describe' function
+type Description struct {
+	Indicator    TypeIndicator
+	VendorKey    string
+	Type         string
+	SubType      string
+	Location     string
+	TimeKey      string
+	Time         time.Time
+	RandomString string
+}
+
 const (
 	vendorLength         = 3
 	typeElementLength    = 2
@@ -151,8 +163,45 @@ func Verify(id, vendorSecret string) (bool, error) {
 	return true, nil
 }
 
-// GetTimeFromID Returns the time from the timekey embedded in ID
-func GetTimeFromID(id string) (time.Time, error) {
+// Describe returns decoded description object for the ID
+func Describe(id string) (Description, error) {
+	_, err := Verify(id, "")
+	if err != nil {
+		return Description{}, err
+	}
+
+	components := strings.Split(id, delimitChar)
+
+	indicatorCom := components[1]
+	sysIndicator := TypeIndicator(indicatorCom[0:1])
+	vendorKey := indicatorCom[1:4]
+	ntype := indicatorCom[4:6]
+	subType := indicatorCom[6:8]
+	location := components[2]
+	timeKey := components[0]
+	randStr := components[3]
+
+	time, err := getTimeFromID(id)
+	if err != nil {
+		return Description{}, err
+	}
+
+	result := Description{
+		Indicator:    sysIndicator,
+		VendorKey:    vendorKey,
+		Type:         ntype,
+		SubType:      subType,
+		Location:     location,
+		TimeKey:      timeKey,
+		Time:         time,
+		RandomString: randStr,
+	}
+
+	return result, nil
+}
+
+// getTimeFromID Returns the time from the timekey embedded in ID
+func getTimeFromID(id string) (time.Time, error) {
 	validate, err := Verify(id, "")
 	if validate != true {
 		return time.Time{}, err
