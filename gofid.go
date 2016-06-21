@@ -44,7 +44,7 @@ const (
 	timeKeyLength        = 9
 	unknownLocationValue = "MISCR"
 	letterBytes          = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	idRegex              = "[A-Z0-9=]{9}-[A-Z0-9=]{8}-[A-Z0-9=]{5}-[A-Z0-9=]{7}\\z"
+	idRegex              = "[A-Z0-9=]{8}-[A-Z0-9=]{9}-[A-Z0-9=]{5}-[A-Z0-9=]{7}\\z"
 
 	/**
 	 * System type indicators
@@ -114,9 +114,8 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 	}
 
 	randomString := getRandString(randLen)
-
 	result := ""
-	preResult := strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", timeKey, delimitChar, systemIndicator, vendor, nType, nSubType, delimitChar, priLocation, delimitChar, randomString))
+	preResult := strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", systemIndicator, vendor, nType, nSubType, delimitChar, timeKey, delimitChar, priLocation, delimitChar, randomString))
 
 	if len(vendorSecret) > 0 {
 		preResult = preResult[:len(preResult)-1]
@@ -172,13 +171,13 @@ func Describe(id string) (Description, error) {
 
 	components := strings.Split(id, delimitChar)
 
-	indicatorCom := components[1]
+	indicatorCom := components[0]
 	sysIndicator := TypeIndicator(indicatorCom[0:1])
 	vendorKey := indicatorCom[1:4]
 	ntype := indicatorCom[4:6]
 	subType := indicatorCom[6:8]
 	location := components[2]
-	timeKey := components[0]
+	timeKey := components[1]
 	randStr := components[3]
 
 	time, err := getTimeFromID(id)
@@ -208,7 +207,7 @@ func getTimeFromID(id string) (time.Time, error) {
 	}
 
 	components := strings.Split(id, delimitChar)
-	miliseconds := components[0]
+	miliseconds := components[1]
 	miliseconds = strings.Replace(miliseconds, paddingChar, "", -1)
 	msInt, err := strconv.ParseInt(miliseconds, 36, 64)
 	if err != nil {
