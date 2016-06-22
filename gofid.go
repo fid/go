@@ -23,8 +23,8 @@ type TypeIndicator string
 type Description struct {
 	Indicator    TypeIndicator
 	VendorKey    string
+	App          string
 	Type         string
-	SubType      string
 	Location     string
 	TimeKey      string
 	Time         time.Time
@@ -33,6 +33,7 @@ type Description struct {
 
 const (
 	vendorLength         = 3
+	appElementLength     = 2
 	typeElementLength    = 2
 	priLocationLength    = 5
 	idLength             = 32
@@ -86,7 +87,7 @@ const (
 )
 
 // Generate returns a new ID in Fortifi Open ID format
-func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocation, vendorSecret string) (string, error) {
+func Generate(systemIndicator TypeIndicator, vendor, app, nType, priLocation, vendorSecret string) (string, error) {
 	timeKey, err := getBase32TimeKey(time.Now())
 	if err != nil {
 		return "", err
@@ -101,12 +102,12 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 		return "", fmt.Errorf("Vendor must be of length '%d'", vendorLength)
 	}
 
-	if len(nType) != typeElementLength {
-		return "", fmt.Errorf("Type must be of length '%d'", typeElementLength)
+	if len(app) != typeElementLength {
+		return "", fmt.Errorf("App must be of length '%d'", appElementLength)
 	}
 
-	if len(nSubType) != typeElementLength {
-		nSubType = nType
+	if len(nType) != typeElementLength {
+		return "", fmt.Errorf("Type must be of length '%d'", typeElementLength)
 	}
 
 	if len(priLocation) != priLocationLength {
@@ -115,7 +116,7 @@ func Generate(systemIndicator TypeIndicator, vendor, nType, nSubType, priLocatio
 
 	randomString := getRandString(randLen)
 	result := ""
-	preResult := strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", systemIndicator, vendor, nType, nSubType, delimitChar, timeKey, delimitChar, priLocation, delimitChar, randomString))
+	preResult := strings.ToUpper(fmt.Sprintf("%s%s%s%s%s%s%s%s%s%s", systemIndicator, vendor, app, nType, delimitChar, timeKey, delimitChar, priLocation, delimitChar, randomString))
 
 	if len(vendorSecret) > 0 {
 		preResult = preResult[:len(preResult)-1]
@@ -174,8 +175,8 @@ func Describe(id string) (Description, error) {
 	indicatorCom := components[0]
 	sysIndicator := TypeIndicator(indicatorCom[0:1])
 	vendorKey := indicatorCom[1:4]
-	ntype := indicatorCom[4:6]
-	subType := indicatorCom[6:8]
+	app := indicatorCom[4:6]
+	nType := indicatorCom[6:8]
 	location := components[2]
 	timeKey := components[1]
 	randStr := components[3]
@@ -188,8 +189,8 @@ func Describe(id string) (Description, error) {
 	result := Description{
 		Indicator:    sysIndicator,
 		VendorKey:    vendorKey,
-		Type:         ntype,
-		SubType:      subType,
+		App:          app,
+		Type:         nType,
 		Location:     location,
 		TimeKey:      timeKey,
 		Time:         time,

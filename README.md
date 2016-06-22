@@ -2,7 +2,7 @@
 FID Library for Go
 
 #### Generate
-Generate(System Indicator, Vendor, Type, SubType, Location, Secret)
+Generate(System Indicator, Vendor, App, Type, Location, Secret)
 ```go
 id, err := gofid.Generate(gofid.IndicatorEntity, "FOR", "TE", "ST", "", "secr3t")
 ```
@@ -24,8 +24,8 @@ Describe returns a description structure
 type Description struct {
 	Indicator    gofid.TypeIndicator
 	VendorKey    string
+	App          string
 	Type         string
-	SubType      string
 	Location     string
 	TimeKey      string
 	Time         time.Time

@@ -11,15 +11,15 @@ const (
 	specTimeKeyLength = 9
 	testVendorSecret  = "bad_secret"
 	testVendor        = "FID"
-	testType          = "TE"
-	testSubType       = "ES"
+	testApp           = "TE"
+	testType          = "ES"
 )
 
 // TestGenerationOfNewID tests that the full ID generation output is as expected
 func TestGenerationOfNewID(t *testing.T) {
 	inputTime := time.Now()
 	t.Log("Testing full ID generation")
-	id, err := Generate(IndicatorEntity, testVendor, testType, testSubType, "", "")
+	id, err := Generate(IndicatorEntity, testVendor, testApp, testType, "", "")
 	if err != nil || id == "" || len(id) != idLength {
 		t.Errorf("Error generating ID")
 	}
@@ -50,7 +50,7 @@ func TestGenerationOfNewID(t *testing.T) {
 func TestGenerationOfNewIDWithVendorSecret(t *testing.T) {
 	inputTime := time.Now()
 	t.Log("Testing full ID generation with vendor secret")
-	id, err := Generate(IndicatorEntity, testVendor, testType, testSubType, "", testVendorSecret)
+	id, err := Generate(IndicatorEntity, testVendor, testApp, testType, "", testVendorSecret)
 	if err != nil || id == "" || len(id) != idLength {
 		t.Errorf("Error generating ID")
 	}
@@ -166,11 +166,11 @@ func TestGetDescription(t *testing.T) {
 	timeKey := "55QRHT4ET"
 	systemIndicator := IndicatorLog
 	vendorKey := "FOR"
-	ntype := "TE"
-	subType := "ST"
+	app := "TE"
+	ntype := "ST"
 	location := "USC1B"
 	rand := "XRAQPPD"
-	inputID := string(systemIndicator) + vendorKey + ntype + subType + delimitChar + timeKey + delimitChar + location + delimitChar + rand
+	inputID := string(systemIndicator) + vendorKey + app + ntype + delimitChar + timeKey + delimitChar + location + delimitChar + rand
 
 	description, err := Describe(inputID)
 	if err != nil {
@@ -189,12 +189,12 @@ func TestGetDescription(t *testing.T) {
 		t.Errorf("Description vendor key %s does not match input %s", description.VendorKey, vendorKey)
 	}
 
-	if description.Type != ntype {
-		t.Errorf("Description type %s does not match input %s", description.Type, ntype)
+	if description.App != app {
+		t.Errorf("Description app %s does not match input %s", description.Type, app)
 	}
 
-	if description.SubType != subType {
-		t.Errorf("Description subType %s does not match input %s", description.SubType, subType)
+	if description.Type != ntype {
+		t.Errorf("Description type %s does not match input %s", description.Type, ntype)
 	}
 
 	if description.Location != location {
@@ -209,13 +209,13 @@ func TestGetDescription(t *testing.T) {
 // Benchmark single fid generation
 func BenchmarkSingleFidGeneration(b *testing.B) {
 	for n := 0; n < 20; n++ {
-		Generate(IndicatorEntity, testVendor, testType, testSubType, "", "")
+		Generate(IndicatorEntity, testVendor, testApp, testType, "", "")
 	}
 }
 
 // Benchmark to generate 1 million FIDs (12.7 seconds on mid 2015 Macbook pro)
 func BenchmarkOneMillionFidGeneration(b *testing.B) {
 	for i := 0; i < 1000000; i++ {
-		Generate(IndicatorEntity, testVendor, testType, testSubType, "", "")
+		Generate(IndicatorEntity, testVendor, testApp, testType, "", "")
 	}
 }
