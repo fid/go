@@ -231,9 +231,7 @@ func getBase32TimeKey(time time.Time) (string, error) {
 	paddingLen := ((len(timeKey) - timeKeyLength) * -1)
 
 	if paddingLen > 0 {
-		for index := 0; index < paddingLen; index++ {
-			timeKey = timeKey + paddingChar
-		}
+		timeKey = strings.Repeat("0", paddingLen) + timeKey
 	}
 
 	if paddingLen < 0 {
