@@ -223,15 +223,17 @@ func isValidIndicator(proposed string) bool {
 	return strings.Contains(string(IndicatorChecksum), proposed)
 }
 
-// getBase32TimeKey returns a millisecond timestamp in base 36
-func getBase32TimeKey(time time.Time) (string, error) {
+// getBase36TimeKey returns a millisecond timestamp in base 36
+func getBase36TimeKey(time time.Time) (string, error) {
 	nanoTime := time.UnixNano()
 	miliTime := nanoTime / 1000000
 	timeKey := strings.ToUpper(strconv.FormatInt(miliTime, timeKeyBase))
-	paddingLen := ((len(timeKey) - timeKeyLength) * -1)
+	paddingLen := timeKeyLength - len(timeKey)
 
 	if paddingLen > 0 {
-		timeKey = strings.Repeat("0", paddingLen) + timeKey
+		for index := 0; index < paddingLen; index++ {
+			timeKey = timeKey + paddingChar
+		}
 	}
 
 	if paddingLen < 0 {
