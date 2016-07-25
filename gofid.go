@@ -39,7 +39,6 @@ const (
 	idLength             = 32
 	timeKeyBase          = 36
 	randLen              = 7
-	paddingChar          = "="
 	delimitChar          = "-"
 	idElements           = 4
 	timeKeyLength        = 9
@@ -209,7 +208,6 @@ func getTimeFromID(id string) (time.Time, error) {
 
 	components := strings.Split(id, delimitChar)
 	miliseconds := components[1]
-	miliseconds = strings.Replace(miliseconds, paddingChar, "", -1)
 	msInt, err := strconv.ParseInt(miliseconds, 36, 64)
 	if err != nil {
 		return time.Time{}, err
@@ -231,9 +229,7 @@ func getBase36TimeKey(time time.Time) (string, error) {
 	paddingLen := timeKeyLength - len(timeKey)
 
 	if paddingLen > 0 {
-		for index := 0; index < paddingLen; index++ {
-			timeKey = timeKey + paddingChar
-		}
+		timeKey = strings.Repeat("0", paddingLen) + timeKey
 	}
 
 	if paddingLen < 0 {
