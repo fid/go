@@ -84,7 +84,7 @@ func TestGenerationOfNewIDWithVendorSecret(t *testing.T) {
 // TestBase36KeyGeneration tests generation of the base36 time key
 func TestBase36KeyGeneration(t *testing.T) {
 	t.Log("Testing base 36 key generation")
-	key, err := getBase32TimeKey(time.Now())
+	key, err := getBase36TimeKey(time.Now())
 
 	if err != nil {
 		t.Errorf("Error generating ID time key")

@@ -88,7 +88,7 @@ const (
 
 // Generate returns a new ID in Fortifi Open ID format
 func Generate(systemIndicator TypeIndicator, vendor, app, nType, priLocation, vendorSecret string) (string, error) {
-	timeKey, err := getBase32TimeKey(time.Now())
+	timeKey, err := getBase36TimeKey(time.Now())
 	if err != nil {
 		return "", err
 	}
