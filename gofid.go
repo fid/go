@@ -32,19 +32,20 @@ type Description struct {
 }
 
 const (
-	vendorLength         = 3
-	appElementLength     = 2
-	typeElementLength    = 2
-	priLocationLength    = 5
-	idLength             = 32
-	timeKeyBase          = 36
-	randLen              = 7
-	delimitChar          = "-"
-	idElements           = 4
-	timeKeyLength        = 9
-	unknownLocationValue = "MISCR"
-	letterBytes          = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	idRegex              = "[A-Z0-9=]{8}-[A-Z0-9=]{9}-[A-Z0-9=]{5}-[A-Z0-9=]{7}\\z"
+	vendorLength          = 3
+	appElementLength      = 2
+	typeElementLength     = 2
+	priLocationLength     = 5
+	idLength              = 32
+	timeKeyBase           = 36
+	randLen               = 7
+	delimitChar           = "-"
+	idElements            = 4
+	timeKeyLength         = 9
+	maxTimestampValBase10 = 101559956668415 // Base 10 representation of Max value of FID Base 32 timestamp
+	unknownLocationValue  = "MISCR"
+	letterBytes           = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	idRegex               = "[A-Z0-9=]{8}-[A-Z0-9=]{9}-[A-Z0-9=]{5}-[A-Z0-9=]{7}\\z"
 
 	/**
 	 * System type indicators
@@ -212,7 +213,10 @@ func getTimeFromID(id string) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, err
 	}
-	return time.Unix(0, msInt*int64(time.Millisecond)), nil
+
+	msSinceEpoch := maxTimestampValBase10 - msInt
+	revMs := (msSinceEpoch * int64(time.Millisecond))
+	return time.Unix(0, revMs), nil
 }
 
 // isValidIndicator checks that proposed indicator is valid as per spec
@@ -225,7 +229,8 @@ func isValidIndicator(proposed string) bool {
 func getBase36TimeKey(time time.Time) (string, error) {
 	nanoTime := time.UnixNano()
 	miliTime := nanoTime / 1000000
-	timeKey := strings.ToUpper(strconv.FormatInt(miliTime, timeKeyBase))
+	revMiliTime := maxTimestampValBase10 - miliTime
+	timeKey := strings.ToUpper(strconv.FormatInt(revMiliTime, timeKeyBase))
 	paddingLen := timeKeyLength - len(timeKey)
 
 	if paddingLen > 0 {

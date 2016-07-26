@@ -42,7 +42,7 @@ func TestGenerationOfNewID(t *testing.T) {
 	keyTime := description.Time
 
 	if keyTime.Day() != inputTime.Day() {
-		t.Errorf("Timekey in ID is an unexpected value")
+		t.Errorf("Timekey in ID is an unexpected value %d : %d", keyTime.Unix(), inputTime.Unix())
 	}
 }
 
